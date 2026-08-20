@@ -1,5 +1,11 @@
+.mobile-nav { display: none; }
+
 @media (max-width: 700px) {
   body { padding-bottom: env(safe-area-inset-bottom); }
+  .mobile-nav { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid #e5e1d8; padding: 7px 0; margin: 0 -17px; padding-left: 17px; padding-right: 17px; scrollbar-width: none; }
+  .mobile-nav::-webkit-scrollbar { display: none; }
+  .mobile-nav-item { border: 0; background: transparent; color: #8d958d; border-radius: 6px; padding: 8px 10px; min-width: max-content; font-size: 10px; font-weight: 700; }
+  .mobile-nav-item.active { background: #e3eadf; color: #455b48; }
   button, .learner-row, .topic-card, .template-item { min-height: 44px; }
   .plan-form input, .plan-form textarea, .plan-form select, .modal input, .modal textarea, .topic-search input { font-size: 16px; }
   .page-heading .lede { max-width: 34rem; }
