@@ -1,0 +1,8 @@
+@media (max-width: 700px) {
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  button, .learner-row, .topic-card, .template-item { min-height: 44px; }
+  .plan-form input, .plan-form textarea, .plan-form select, .modal input, .modal textarea, .topic-search input { font-size: 16px; }
+  .page-heading .lede { max-width: 34rem; }
+  .capture-panel { align-items: center; }
+  .capture-panel .button { min-height: 44px; }
+}
