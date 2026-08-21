@@ -1,10 +1,11 @@
-const learners = [
+const defaultLearners = [
   { id: 'alex', initials: 'AH', name: 'Alex Harper', age: 23, meta: 'Lesson 12 · Junctions', progress: 68, status: 'On track', tone: 'olive' },
   { id: 'priya', initials: 'PS', name: 'Priya Shah', age: 31, meta: 'Lesson 8 · Independent driving', progress: 51, status: 'Needs focus', tone: 'peach' },
   { id: 'oliver', initials: 'OR', name: 'Oliver Reed', age: 18, meta: 'Lesson 21 · Mock test', progress: 86, status: 'Test ready', tone: 'lilac' },
   { id: 'mia', initials: 'MC', name: 'Mia Collins', age: 27, meta: 'Lesson 5 · Moving off', progress: 29, status: 'Getting started', tone: 'butter' }
 ];
 const storedRecords = (key) => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch (error) { return []; } };
+const learners = storedRecords('roadwiseLearners').length ? storedRecords('roadwiseLearners') : defaultLearners;
 const lessonPlans = storedRecords('roadwiseLessonPlans');
 const feedbackEntries = storedRecords('roadwiseFeedbackEntries');
 const saveRecords = (key, records) => localStorage.setItem(key, JSON.stringify(records));
@@ -14,6 +15,7 @@ function refreshLearnerOptions() {
   if (planStudent) planStudent.innerHTML = learners.map((learner) => `<option>${learner.name}</option>`).join('');
   if (feedbackLearner) feedbackLearner.innerHTML = learners.map((learner) => `<option value="${learner.name}">${learner.name}</option>`).join('');
 }
+function saveLearners() { saveRecords('roadwiseLearners', learners); refreshLearnerOptions(); }
 const topics = [
   { title: 'Controls & cockpit drill', focus: 'Set up for a safe, confident drive', objectives: ['Identify and set all primary controls before moving.', 'Explain why seating, mirrors and restraints affect safety.'], sequence: ['Welcome learner at the parked car; invite them to set up without help.', 'Use show-me / tell-me prompts to check the cockpit drill.', 'Ask the learner to explain each adjustment and its safety benefit.', 'Repeat the drill until it is calm, consistent and independent.'], errors: ['Skipping the handbrake or gear check', 'Poor mirror alignment', 'Starting the engine before the safety checks'], questions: ['What would you like to adjust before we move?', 'What can you see in each mirror?', 'How will you know the car is secure?'], exercise: 'Park, reset the cockpit and complete the drill twice: once with a prompt, once independently.' },
   { title: 'Moving off & stopping', focus: 'Build a repeatable routine for smooth starts', objectives: ['Move away safely on a quiet, level road.', 'Stop under control with effective observation.'], sequence: ['Brief the POM routine: prepare, observe, move.', 'Demonstrate one calm move-off and narrate the observations.', 'Coach the learner through five starts, reducing prompts each time.', 'Add a controlled stop and secure the car after each repetition.'], errors: ['Rushing observations', 'Poor clutch biting-point control', 'Forgetting to secure the car after stopping'], questions: ['What is the car telling you through the clutch?', 'Where is the first safe gap?', 'What must you check before you release the brake?'], exercise: 'Complete five move-offs and stops, changing the stopping point each time.' },
@@ -158,7 +160,7 @@ function saveCurrentLessonPlan() {
   const learnerName = field('Student').querySelector('select').value;
   const learner = learners.find((item) => item.name === learnerName) || learners[0];
   const plan = { id: `plan-${Date.now()}`, learnerId: learner.id, learnerName: learner.name, lessonNumber: field('Lesson number').querySelector('input').value || '1', objective: field('Lesson objective').querySelector('textarea').value, skills: field('Key skills today').querySelector('input').value, route: field('Planned route').querySelector('input').value, topic: field('Lesson objective').querySelector('textarea').value.slice(0, 42), templateId: activePlanTemplate.id, templateStage: activePlanTemplate.stage, components: activePlanTemplate.components, savedLabel: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) };
-  lessonPlans.unshift(plan);
+    lessonPlans.unshift(plan);
   saveRecords('roadwiseLessonPlans', lessonPlans);
     renderSavedPlans(plan.id);
     refreshLearnerOptions();
@@ -200,9 +202,9 @@ function setupStoredRecordUi() {
   setupCurrentOverviewHeader();
   const planStudent = Array.from($('#plansView .plan-form').querySelectorAll('label')).find((label) => label.textContent.includes('Student')).querySelector('select');
   planStudent.innerHTML = learners.map((learner) => `<option>${learner.name}</option>`).join('');
-  setupLearnerIntakeForm();
+    setupLearnerIntakeForm(); saveLearners();
   setupPlanTemplates();
-    $('#learnerForm').addEventListener('submit', () => { const details = Object.fromEntries(new FormData($('#learnerForm'))); setTimeout(() => { if (learners[0] && learners[0].name === details.name) learners[0].details = details; }, 0); });
+    $('#learnerForm').addEventListener('submit', () => { const details = Object.fromEntries(new FormData($('#learnerForm'))); setTimeout(() => { if (learners[0] && learners[0].name === details.name) { learners[0].details = details; saveLearners(); } }, 0); });
   const planSidebar = $('.plan-sidebar');
   const savedPlansHeading = document.createElement('div');
   savedPlansHeading.className = 'saved-plans-heading';
